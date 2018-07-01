@@ -8,7 +8,7 @@ A Music Player built using Electron JS that has the ability to run on all platfo
 
 
 
-Node JS is used for accessing the local music files from the user's computer.
+Node JS is used for accessing the music files from the user's computer.
 
 
 Electron provides desktop user interface similar to those offered by normal softwares but with the advantage of using 
