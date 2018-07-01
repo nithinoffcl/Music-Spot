@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>MusicSpot</title>
+  <link rel ="stylesheet" href = "node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <style>
+    .gradient {
+  position: relative;
+  min-height: 80px;
+  background-image: linear-gradient(
+    to right,
+    hsl(211, 2%, 50%),
+    hsl(189, 100%, 50%)
+  );
+  z-index: 1;
+}
+
+.gradient::before {
+  position: absolute;
+  content: "";
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: linear-gradient(
+    to bottom,
+    hsl(324, 2%, 50%),
+    hsl(328, 100%, 50%)
+  );
+  z-index: -1;
+  transition: opacity 0.1s linear;
+  opacity: 0;
+}
+.gradient:hover::before {
+  opacity: 1;
+}
+    </style>
+  </head>
+  <script src = "node_modules/wavesurfer/dist/wavesurfer.min.js"></script>
+  <script>
+  const {ipcRenderer,net} = require('electron');
+  const os = require('os');
+  const folder = os.homedir()+'/Music/';
+  </script>
+  <body>
+    <center>
+    <h1 style="color:3h3f3g">Hello Mr Nithin!!</h1>
+    <p style="color:#2f2e9f">Welcome to your Music Player</p>
+    <h1 id ='heading'></h1>
+
+    <div class="gradient">
+      <p id = "playing"></p>
+    <div id ="waveform" style="backgroundColor : rgba(0,0,0,0.6)">
+      <script>
+      const fs = require('fs');
+
+      var index = 2;
+
+      var load = function load(index) {
+      fs.readdir(folder,  (error,music) => {
+      if(music)
+      {
+          playlist(music);
+
+          wavesurfer.load(folder+music[index]); //loads the necessary music
+            wavesurfer.on('ready', function(){ //when the wavesurfer is ready to draw loaded with music,we call the functionn
+              play();
+              nextandprevious(music,index);
+            })
+
+      }
+      else
+       {
+        console.error(error);
+      }
+    });
+  }
+
+  module.exports = load;
+
+      var wavesurfer = WaveSurfer.create({
+        container : '#waveform',
+        cursorColor : 'green',
+        waveColor : '#ffffff',
+        progressColor : 'green',
+        normalize : true,
+        height : 80,
+        barHeight : 30,
+        barWidth : 3,
+        barRadius : true,
+        splitChannels : true,
+        backend :'WebAudio',
+        hideScrollbar : true,
+        responsive : false,
+      })
+
+      function nextandprevious(music,index) {
+        if(wavesurfer.isPlaying) {
+
+        document.getElementById('heading').innerHTML = 'Now Playing';
+        document.getElementById('playing').innerHTML = music[index];
+        document.getElementById('next').innerHTML = 'Next : '+music[index+1];
+        document.getElementById('previous').innerHTML ='Previous : '+music[index-1];
+      }
+    }
+      function playlist(music) {
+          var playlist = new Map();
+          for(i=2;i<music.length;i++) {
+          playlist.set(i,music[i])
+        }
+          console.log(playlist.size);
+          for (var [key, value] of playlist) {
+          console.log(key + " is the index of " + value);
+      }
+      }
+
+      function play() {
+        wavesurfer.play();
+      }
+
+      function playPause() {
+        wavesurfer.playPause();
+      }
+
+      function stop() {
+        wavesurfer.stop();
+      }
+
+      wavesurfer.on('finish', function(){
+        index+=1;
+        load(index);
+      })
+
+      </script>
+    </div>
+    </div><br>
+
+    <p>Click the button below to Play your songs</p>
+    <button class="btn btn-primary" name="play" style="
+    padding-top: 1px;
+    padding-right: 1px;
+    padding-left: 1px;
+    padding-bottom: 1px;
+    width: 46px;
+    height: 26px;
+    color:red;
+    border-top-width: 2px;
+    margin-right: 2px;
+    margin-bottom: 2px;
+    margin-left: 2px;
+    " onclick="load(index)">Play</button>
+
+    <p>click the button below to pause</p>
+    <button class="btn btn-primary" name="pause" style="
+    padding-top: 1px;
+    padding-right: 1px;
+    padding-left: 1px;
+    padding-bottom: 1px;
+    width: 46px;
+    height: 26px;
+    color:red;
+    margin-top: 2px;
+    margin-right: 2px;
+    margin-left: 2px;
+    margin-bottom: 2px;
+    " onclick="playPause()">Pause</button>
+
+    <p>click the button below to stop</p>
+    <button class="btn btn-primary" name="stop" style="
+      padding-top: 1px;
+      padding-right: 1px;
+      padding-left: 1px;
+      padding-bottom: 1px;
+      width: 46px;
+      height: 26px;
+      color:red;
+      margin-top: 2px;
+      margin-right: 2px;
+      margin-left: 2px;
+      margin-bottom: 2px;
+      " onclick="stop()">Stop</button>
+
+  </center>
+  <button class="btn btn-primary" id="next" style="
+    padding-top: 1px;
+    padding-right: 1px;
+    padding-left: 1px;
+    padding-bottom: 1px;
+    width: 40px;
+    height: 26px;
+    color:red;
+    margin-top: 2px;
+    margin-right: 2px;
+    margin-left: 2px;
+    margin-bottom: 2px;
+    " onclick="load(index+=1)">Next</button>
+    <br>
+    <br>
+
+    <button class="btn btn-primary" id="previous" style="
+      padding-top: 1px;
+      padding-right: 1px;
+      padding-left: 1px;
+      padding-bottom: 1px;
+      width: 62px;
+      height: 30px;
+      color:red;
+      margin-top: 2px;
+      margin-right: 2px;
+      margin-left: 2px;
+      margin-bottom: 2px;
+      " onclick="load(index-=1)">Previous</button>
+      <div class = "container">
+        <h6 id = "gallery"></h6>
+      </div>
+  </body>
+</html>
